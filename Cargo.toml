@@ -1,0 +1,20 @@
+[package]
+name = "kademlia"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+hex-literal = "1.1.0"
+rand = "0.9.2"
+serde = {version ="1.0.228", features = ["derive"]}
+serde_json = "1.0.148"
+sha1 = "0.10.6"
+rusqlite = "0.38.0"
+hex = "0.4.3"
+serde_yaml = "0.9.34"
+actix = "0.13.5"
+actix-web = "4.12.1"
+env_logger = "0.11.8"
+log = "0.4.29"
+bincode = "2.0.0"
