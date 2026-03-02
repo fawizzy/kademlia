@@ -1,7 +1,8 @@
-use sha1::{Digest, Sha1};
 use rand::Rng;
+use sha1::{Digest, Sha1};
 
 use crate::utils::constant::ID_BYTES;
+
 pub fn generate_id() -> [u8; ID_BYTES] {
     let mut hasher = Sha1::new();
     let mut rng = rand::rng();

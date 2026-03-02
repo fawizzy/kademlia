@@ -7,14 +7,17 @@ use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dht::{bucket::Bucket, ping_request::ping_request},
-    startup::RpcManager,
+    dht::{
+        bucket::Bucket,
+        node::{Identity, Node},
+    },
+    network::rpc::RpcManager,
     utils::{
         constant::{ID_BYTES, K},
         distance::{compare_distance, xor_distance},
-        node::{Identity, Node},
     },
 };
+
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub enum FindNodeResult {
     Found(Node),
@@ -36,14 +39,13 @@ impl RoutingTable {
     pub async fn insert_node(
         &mut self,
         node: &Node,
-        rpc_manager: Arc<Mutex<RpcManager>>,
-        udp_socket: Arc<UdpSocket>,
+        _rpc_manager: Arc<Mutex<RpcManager>>,
+        _udp_socket: Arc<UdpSocket>,
     ) {
         let distance = Identity::distance_to_self(node.node_id);
         let bucket_index = Bucket::get_bucket_index(distance);
 
         let bucket = &mut self.buckets[bucket_index];
-
 
         if let Some(pos) = bucket.nodes.iter().position(|n| {
             n.clone()
@@ -77,7 +79,7 @@ impl RoutingTable {
             }
         }
 
-        let local_node = Identity::load();
+        // let local_node = Identity::load();
 
         all_nodes
     }

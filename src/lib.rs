@@ -1,7 +1,5 @@
-pub mod db;
-pub mod startup;
-pub mod utils;
 pub mod dht;
+pub mod http;
+pub mod network;
 pub mod storage;
-pub mod protocol;
-// pub mod test;
+pub mod utils;

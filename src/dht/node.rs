@@ -1,12 +1,13 @@
 use std::{fs, net::IpAddr};
 
 use crate::utils::{
-    constant::{ID_BYTES, PORT}, distance::xor_distance, generate_id::generate_id
+    constant::{ID_BYTES, PORT},
+    crypto::generate_id,
+    distance::xor_distance,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tokio::runtime::Id;
 
 #[derive(Serialize, Deserialize)]
 struct Config {

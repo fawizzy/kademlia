@@ -4,9 +4,9 @@ use actix_web::{HttpResponse, Responder, web};
 use hex::decode;
 use tokio::sync::Mutex;
 
-use crate::{
-    dht::routing::{FindNodeResult, RoutingTable},
-    utils::node,
+use crate::dht::{
+    node::Node,
+    routing::{FindNodeResult, RoutingTable},
 };
 
 pub async fn find_node(
@@ -24,7 +24,7 @@ pub async fn find_node(
         FindNodeResult::Found(node) => vec![node],
     };
 
-    node_results.push(node::Node {
+    node_results.push(Node {
         ip: IpAddr::V4("127.0.0.1".parse().unwrap()),
         port: 0000,
         node_id,

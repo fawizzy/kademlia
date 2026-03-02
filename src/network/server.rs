@@ -1,57 +1,27 @@
-use std::sync::Arc;
-
 use actix_web::{App, HttpServer, web};
-use bincode::{config::standard, encode_to_vec};
+use bincode::config::standard;
 use rusqlite::Connection;
-use tokio::{
-    net::{TcpListener, UdpSocket},
-    sync::Mutex,
-};
+use std::sync::Arc;
+use tokio::{net::UdpSocket, sync::Mutex};
 
 use crate::{
-    dht::{
-        find_node::find_node, node_lookup::node_lookup, routing::{FindNodeResult, RoutingTable}
+    dht::routing::RoutingTable,
+    http::routes::find_node,
+    network::{
+        handler::process_udp_request,
+        messages::{UdpMessage, UdpResponse},
+        rpc::RpcManager,
     },
-    protocol::opcode::{UdpMessage, UdpRequest, UdpResponse, process_udp_request},
-    storage::db::init_db,
-    utils::constant::ID_BYTES,
+    storage::sqlite::init_db,
 };
-
-use std::collections::HashMap;
-use tokio::sync::oneshot;
-
-
-pub struct RpcManager {
-    pending: HashMap<[u8; ID_BYTES], oneshot::Sender<UdpResponse>>,
-}
-
-impl RpcManager {
-    pub fn new() -> Self {
-        Self {
-            pending: HashMap::new(),
-        }
-    }
-
-    pub fn insert(&mut self, request_id: [u8; ID_BYTES], tx: oneshot::Sender<UdpResponse>) {
-        self.pending.insert(request_id, tx);
-    }
-
-    pub fn resolve(&mut self, request_id: [u8; ID_BYTES], response: UdpResponse) {
-        if let Some(tx) = self.pending.remove(&request_id) {
-            let _ = tx.send(response);
-        }
-    }
-}
 
 async fn start_tcp_server(
     udp_socket: Arc<UdpSocket>,
-    // rpc_manager: Arc<Mutex<RpcManager>>
     routing_table: Arc<Mutex<RoutingTable>>,
 ) -> std::io::Result<()> {
-   
     let routing_table = web::Data::new(routing_table.clone());
     let udp_socket = web::Data::new(udp_socket.clone());
-    
+
     HttpServer::new(move || {
         App::new()
             .app_data(routing_table.clone())
@@ -135,12 +105,8 @@ pub async fn start_server() {
         start_udp_server(udp_socket, conn, udp_rt, udp_rpc_manager).await;
     });
 
-    
-
-
     let tcp_rt = routing_table.clone();
     let tcp_udp_scocket = socket.clone();
-    // let tcp_rpc_manager = rpc_manager.clone();
 
     if let Err(e) = start_tcp_server(tcp_udp_scocket, tcp_rt).await {
         eprintln!("TCP server error: {}", e);

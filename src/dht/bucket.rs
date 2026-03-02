@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
-use crate::utils::{constant::{ID_BYTES, K}, node::Node};
+use crate::dht::node::Node;
+use crate::utils::constant::{ID_BYTES, K};
 
 #[derive(Debug, Clone)]
 pub struct Bucket {
