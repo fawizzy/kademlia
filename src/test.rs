@@ -4,7 +4,7 @@ use bincode::{Decode, Encode, config::standard};
 use std::error::Error;
 
 // Make sure these match your server structs
-#[derive(Debug, Clone, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Encode, Decode)]
 pub struct Node {
     pub ip: IpAddr,
     pub port: u16,

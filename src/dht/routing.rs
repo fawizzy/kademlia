@@ -1,10 +1,14 @@
 use std::net::IpAddr;
+use std::sync::Arc;
+use tokio::net::UdpSocket;
+use tokio::sync::Mutex;
 
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dht::bucket::Bucket,
+    dht::{bucket::Bucket, ping_request::ping_request},
+    startup::RpcManager,
     utils::{
         constant::{ID_BYTES, K},
         distance::{compare_distance, xor_distance},
@@ -29,11 +33,17 @@ impl RoutingTable {
         RoutingTable { buckets }
     }
 
-    pub fn insert_node(&mut self, node: &Node) {
+    pub async fn insert_node(
+        &mut self,
+        node: &Node,
+        rpc_manager: Arc<Mutex<RpcManager>>,
+        udp_socket: Arc<UdpSocket>,
+    ) {
         let distance = Identity::distance_to_self(node.node_id);
         let bucket_index = Bucket::get_bucket_index(distance);
 
         let bucket = &mut self.buckets[bucket_index];
+
 
         if let Some(pos) = bucket.nodes.iter().position(|n| {
             n.clone()
@@ -98,5 +108,4 @@ impl RoutingTable {
 
         FindNodeResult::Closest(all_nodes.iter().map(|n| n.clone()).collect::<Vec<Node>>())
     }
-
 }

@@ -15,7 +15,7 @@ struct Config {
     port: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Encode, Decode, Copy)]
 pub struct Node {
     pub ip: IpAddr,
     pub port: u16,
